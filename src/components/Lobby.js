@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import Pusher from 'pusher-js';
 import gameService from '../services/gameService';
 
 const Lobby = () => {
   const [games, setGames] = useState([]);
+  const [creatingGame, setCreatingGame] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    // Fetch initial list of games
     const fetchGames = async () => {
       try {
         const data = await gameService.getGames();
@@ -17,26 +19,42 @@ const Lobby = () => {
     };
     fetchGames();
 
-    // Initialize Pusher and subscribe to 'game-created' event
     const pusher = new Pusher('d29bf340b0ce1bfc0bc9', {
       cluster: 'ap2',
     });
 
     const channel = pusher.subscribe('lobby');
     channel.bind('game-created', (data) => {
-      // Update state when a new game is created
       setGames((prevGames) => [...prevGames, data]);
     });
 
-    // Clean up on component unmount
+    channel.bind('game-updated', (data) => {
+      setGames((prevGames) =>
+        prevGames.map((game) =>
+          game._id === data.gameId ? { ...game, status: data.status } : game
+        )
+      );
+    });
+
     return () => {
       pusher.unsubscribe('lobby');
     };
   }, []);
 
+  const createGame = async () => {
+    try {
+      await gameService.createGame();
+      setCreatingGame(false); // Hide form or update state as needed
+    } catch (error) {
+      console.error('Error creating game:', error);
+      alert('Error creating game');
+    }
+  };
+
   const joinGame = async (gameId) => {
     try {
       await gameService.joinGame(gameId);
+      navigate(`/game/${gameId}`); // Redirect to the game page
     } catch (error) {
       console.error('Error joining game:', error);
       alert('Error joining game');
@@ -46,19 +64,24 @@ const Lobby = () => {
   return (
     <div>
       <h2>Game Lobby</h2>
+      {creatingGame ? (
+        <div>
+          <button onClick={createGame}>Create Game</button>
+          {/* Add additional form fields here if needed */}
+        </div>
+      ) : (
+        <button onClick={() => setCreatingGame(true)}>Create New Game</button>
+      )}
       <ul>
-        {games.length > 0 ? (
-          games.map((game) => (
-            <li key={game._id}>
-              <p>Game ID: {game._id}</p>
-              <p>Status: {game.status}</p>
-              <p>Participants: {game.participants.length}</p>
+        {games.map((game) => (
+          <li key={game._id}>
+            <p>Game ID: {game._id}</p>
+            <p>Status: {game.status}</p>
+            {game.status === 'waiting' && (
               <button onClick={() => joinGame(game._id)}>Join Game</button>
-            </li>
-          ))
-        ) : (
-          <p>No games available.</p>
-        )}
+            )}
+          </li>
+        ))}
       </ul>
     </div>
   );

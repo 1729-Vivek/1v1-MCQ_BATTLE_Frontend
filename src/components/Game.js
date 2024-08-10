@@ -24,7 +24,7 @@ const Game = ({ gameId }) => {
   return (
     <div>
       <h2>Game</h2>
-      {mcqs.length > 0 && (
+      {mcqs.length > 0 ? (
         <div>
           <p>{mcqs[currentMCQ].question}</p>
           {mcqs[currentMCQ].options.map((option, index) => (
@@ -33,6 +33,8 @@ const Game = ({ gameId }) => {
             </button>
           ))}
         </div>
+      ) : (
+        <p>Loading...</p>
       )}
     </div>
   );
