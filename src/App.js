@@ -1,12 +1,14 @@
+// src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import MCQList from './components/MCQList';
 import MCQForm from './components/MCQForm';
-import Lobby from './components/Lobby';  // Add this import
-import Game from './components/Game';    // Add this import
+import Lobby from './components/Lobby';
+import PrivateRoute from './components/PrivateRoute';
+import Home from './components/Home'
 
 const App = () => {
   return (
@@ -15,11 +17,23 @@ const App = () => {
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/mcqs" element={<MCQList />} />
-        <Route path="/mcq/new" element={<MCQForm />} />
-        <Route path="/mcq/edit/:id" element={<MCQForm />} />
-        <Route path="/lobby" element={<Lobby />} />     {/* Add route for Lobby */}
-        <Route path="/game/:id" element={<Game />} />   {/* Add route for Game */}
+        <Route
+          path="/mcqs"
+          element={<PrivateRoute element={MCQList} />}
+        />
+        <Route
+          path="/mcq/new"
+          element={<PrivateRoute element={MCQForm} />}
+        />
+        <Route
+          path="/mcq/edit/:id"
+          element={<PrivateRoute element={MCQForm} />}
+        />
+        <Route
+          path="/lobby"
+          element={<PrivateRoute element={Lobby} />}
+        />
+        <Route path="/" element={<Home />} />
       </Routes>
     </Router>
   );
