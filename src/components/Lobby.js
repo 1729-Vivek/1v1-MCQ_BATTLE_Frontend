@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Pusher from 'pusher-js';
 import gameService from '../services/gameService';
 
 const Lobby = () => {
   const [games, setGames] = useState([]);
   const [creatingGame, setCreatingGame] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -43,8 +43,9 @@ const Lobby = () => {
 
   const createGame = async () => {
     try {
-      await gameService.createGame();
-      setCreatingGame(false); // Hide form or update state as needed
+      const game = await gameService.createGame();
+      setCreatingGame(false);
+      navigate(`/game/${game._id}`); // Navigate to the created game page
     } catch (error) {
       console.error('Error creating game:', error);
       alert('Error creating game');
@@ -53,8 +54,8 @@ const Lobby = () => {
 
   const joinGame = async (gameId) => {
     try {
-      await gameService.joinGame(gameId);
-      navigate(`/game/${gameId}`); // Redirect to the game page
+      const updatedGame = await gameService.joinGame(gameId);
+      navigate(`/game/${gameId}/play`); // Navigate to the PlayGame page with gameId
     } catch (error) {
       console.error('Error joining game:', error);
       alert('Error joining game');
@@ -67,7 +68,6 @@ const Lobby = () => {
       {creatingGame ? (
         <div>
           <button onClick={createGame}>Create Game</button>
-          {/* Add additional form fields here if needed */}
         </div>
       ) : (
         <button onClick={() => setCreatingGame(true)}>Create New Game</button>

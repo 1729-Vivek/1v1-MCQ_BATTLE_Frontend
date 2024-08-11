@@ -6,7 +6,8 @@ import Login from './components/Login';
 import MCQList from './components/MCQList';
 import MCQForm from './components/MCQForm';
 import Lobby from './components/Lobby';
-import Game from './components/Game'; // Import the Game component
+import Game from './components/Game';
+import PlayGame from './components/PlayGame'; // Import the PlayGame component
 import PrivateRoute from './components/PrivateRoute';
 import Home from './components/Home';
 
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/mcq/edit/:id" element={<PrivateRoute element={MCQForm} />} />
         <Route path="/lobby" element={<PrivateRoute element={Lobby} />} />
         <Route path="/game/:gameId" element={<PrivateRoute element={Game} />} />
+        <Route path="/game/:gameId/play" element={<PrivateRoute element={PlayGame} />} /> {/* New PlayGame Route */}
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>
