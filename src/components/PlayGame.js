@@ -42,19 +42,10 @@ const PlayGame = () => {
     return () => clearInterval(timer);
   }, [gameId]);
 
-  useEffect(() => {
-    if (gameResults) {
-      console.log("Game Results Updated:", gameResults);
-    }
-  }, [gameResults]);
-
   const endGame = async () => {
     try {
-      console.log("Ending game...");
       const result = await gameService.endGame(gameId);
-      console.log("Main result", result);
       setGameResults(result);
-      console.log(gameResults)
       setGameEnded(true);
       alert('Time is up! The game has ended.');
     } catch (error) {
@@ -91,7 +82,6 @@ const PlayGame = () => {
     if (currentMCQ < mcqs.length - 1) {
       setCurrentMCQ(currentMCQ + 1);
     } else {
-      alert(`Game Over! Your final score is: ${score}/${mcqs.length}`);
       endGame();
     }
   };
@@ -139,7 +129,7 @@ const PlayGame = () => {
               <p>Score: {result.score}</p>
             </div>
           ))}
-          <p>Winner: {gameResults.winner.user}</p>
+          <p>Winner: {gameResults.winner ? gameResults.winner.user : 'It\'s a tie!'}</p>
           {gameResults.loser && (
             <p>Loser: {gameResults.loser.user}</p>
           )}
