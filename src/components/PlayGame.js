@@ -10,6 +10,8 @@ const PlayGame = () => {
   const [loading, setLoading] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
+  const [gameEnded, setGameEnded] = useState(false);
 
   useEffect(() => {
     const fetchMCQs = async () => {
@@ -24,7 +26,32 @@ const PlayGame = () => {
     };
 
     fetchMCQs();
+
+    const timer = setInterval(() => {
+      setTimeLeft(prevTime => {
+        if (prevTime <= 0) {
+          clearInterval(timer);
+          endGame();
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [gameId]);
+
+  const endGame = async () => {
+    try {
+      console.log("ending game");
+      await gameService.endGame(gameId);
+      setGameEnded(true);
+      alert('Time is up! The game has ended.');
+    } catch (error) {
+      console.error('Error ending game:', error);
+      alert('Error ending the game.');
+    }
+  };
 
   const handleOptionClick = (option) => {
     setSelectedAnswer(option);
@@ -44,16 +71,18 @@ const PlayGame = () => {
       setShowResult(true);
     } catch (error) {
       console.error('Error submitting answer:', error);
+      alert('Error submitting answer.');
     }
   };
 
-  const handleNext = () => {
+  const  handleNext = () => {
     setSelectedAnswer(null);
     setShowResult(false);
     if (currentMCQ < mcqs.length - 1) {
       setCurrentMCQ(currentMCQ + 1);
     } else {
       alert(`Game Over! Your final score is: ${score}/${mcqs.length}`);
+      endGame();
     }
   };
 
@@ -62,6 +91,7 @@ const PlayGame = () => {
   return (
     <div>
       <h1>Play Game</h1>
+      <p>Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</p>
       {mcqs.length === 0 ? (
         <p>No MCQs available for this game.</p>
       ) : (
@@ -85,12 +115,12 @@ const PlayGame = () => {
           </div>
           {showResult && (
             <div>
-              {/* <p>{selectedAnswer === mcqs[currentMCQ].correctOption ? 'Correct!' : 'Incorrect'}</p> */}
               <button onClick={handleNext}>Next</button>
             </div>
           )}
         </div>
       )}
+      {gameEnded && <p>The game has ended. Please wait for the results.</p>}
     </div>
   );
 };
