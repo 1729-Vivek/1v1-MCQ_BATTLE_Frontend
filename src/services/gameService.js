@@ -84,12 +84,9 @@ const addMCQs = async (gameId, mcqIds) => {
 const endGame = async (gameId) => {
   try {
     const token = localStorage.getItem('token');
-    console.log("dukh")
     const response = await axios.post(`${API_URL}/${gameId}/end`, {}, {
       headers: { 'x-auth-token': token },
     });
-    console.log("Here")
-    console.log(response)
     return response.data;
   } catch (error) {
     console.error('Error ending game:', error.response ? error.response.data : error.message);
@@ -105,7 +102,7 @@ const gameService = {
   getGameDetails,
   submitAnswer,
   addMCQs,
-  endGame, // Added endGame to the service
+  endGame,
 };
 
 export default gameService;

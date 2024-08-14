@@ -13,12 +13,18 @@ const PlayGame = () => {
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
   const [gameEnded, setGameEnded] = useState(false);
   const [gameResults, setGameResults] = useState(null);
+  const [gameStatus, setGameStatus] = useState('waiting'); // Track game status
 
   useEffect(() => {
-    const fetchMCQs = async () => {
+    const fetchGameDetails = async () => {
       try {
         const gameData = await gameService.getGameDetails(gameId);
-        setMcqs(gameData.mcqs);
+        if (gameData.status === 'active') {
+          setMcqs(gameData.mcqs);
+          setGameStatus('active');
+        } else {
+          setGameStatus(gameData.status);
+        }
         setLoading(false);
       } catch (error) {
         console.error('Error fetching game details:', error);
@@ -26,7 +32,7 @@ const PlayGame = () => {
       }
     };
 
-    fetchMCQs();
+    fetchGameDetails();
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -87,6 +93,10 @@ const PlayGame = () => {
   };
 
   if (loading) return <div>Loading...</div>;
+
+  if (gameStatus === 'waiting') {
+    return <div>Waiting for another player to join...</div>;
+  }
 
   return (
     <div>
