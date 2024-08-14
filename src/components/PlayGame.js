@@ -12,6 +12,7 @@ const PlayGame = () => {
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
   const [gameEnded, setGameEnded] = useState(false);
+  const [gameResults, setGameResults] = useState(null);
 
   useEffect(() => {
     const fetchMCQs = async () => {
@@ -28,7 +29,7 @@ const PlayGame = () => {
     fetchMCQs();
 
     const timer = setInterval(() => {
-      setTimeLeft(prevTime => {
+      setTimeLeft((prevTime) => {
         if (prevTime <= 0) {
           clearInterval(timer);
           endGame();
@@ -41,10 +42,19 @@ const PlayGame = () => {
     return () => clearInterval(timer);
   }, [gameId]);
 
+  useEffect(() => {
+    if (gameResults) {
+      console.log("Game Results Updated:", gameResults);
+    }
+  }, [gameResults]);
+
   const endGame = async () => {
     try {
-      console.log("ending game");
-      await gameService.endGame(gameId);
+      console.log("Ending game...");
+      const result = await gameService.endGame(gameId);
+      console.log("Main result", result);
+      setGameResults(result);
+      console.log(gameResults)
       setGameEnded(true);
       alert('Time is up! The game has ended.');
     } catch (error) {
@@ -75,7 +85,7 @@ const PlayGame = () => {
     }
   };
 
-  const  handleNext = () => {
+  const handleNext = () => {
     setSelectedAnswer(null);
     setShowResult(false);
     if (currentMCQ < mcqs.length - 1) {
@@ -120,7 +130,22 @@ const PlayGame = () => {
           )}
         </div>
       )}
-      {gameEnded && <p>The game has ended. Please wait for the results.</p>}
+      {gameEnded && gameResults && (
+        <div>
+          <h2>Game Over!</h2>
+          {gameResults.results.map((result, index) => (
+            <div key={index}>
+              <p>Username: {result.user}</p>
+              <p>Score: {result.score}</p>
+            </div>
+          ))}
+          <p>Winner: {gameResults.winner.user}</p>
+          {gameResults.loser && (
+            <p>Loser: {gameResults.loser.user}</p>
+          )}
+          <p>Score Difference: {gameResults.scoreDifference}</p>
+        </div>
+      )}
     </div>
   );
 };
