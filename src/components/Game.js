@@ -9,15 +9,13 @@ const Game = () => {
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
 
-// Fetch game details in Game component
-// Fetch game details in Game component
-// Fetch game details in Game component
-useEffect(() => {
+  // Fetch game details in Game component
+  useEffect(() => {
     const fetchGameDetails = async () => {
       try {
         const gameData = await gameService.getGameDetails(gameId);
         console.log('Fetched game data:', gameData); // Debugging log
-        setMcqs(gameData.mcqs);
+        setMcqs(gameData.mcqs); // Ensure all MCQs are set
         setLoading(false);
       } catch (error) {
         console.error('Error fetching game details:', error);
@@ -26,8 +24,6 @@ useEffect(() => {
     };
     fetchGameDetails();
   }, [gameId]);
-  
-  
 
   const submitAnswer = async (answer) => {
     try {
