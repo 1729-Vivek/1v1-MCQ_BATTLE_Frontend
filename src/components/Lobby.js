@@ -45,13 +45,13 @@ const Lobby = () => {
     try {
       const game = await gameService.createGame();
       setCreatingGame(false);
-      navigate(`/game/${game._id}`); // Navigate to the created game page
+      await joinGame(game._id); // Join the game after creating it
     } catch (error) {
       console.error('Error creating game:', error);
       alert('Error creating game');
     }
   };
-
+  
   const joinGame = async (gameId) => {
     try {
       const updatedGame = await gameService.joinGame(gameId);
@@ -61,6 +61,7 @@ const Lobby = () => {
       alert('Error joining game');
     }
   };
+  
 
   return (
     <div>
